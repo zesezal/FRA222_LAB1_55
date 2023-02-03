@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -42,6 +42,252 @@
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+//L1 = PC10
+//L2 = PC11
+//L3 = PC12
+//L4 = PD2
+
+//R1 = PC9
+//R2 = PC8
+//R3 = PB8
+//R4 = PC6
+static int keep_button[16];
+static int assign_button[16];
+static int state = 0;
+
+static int current_button;
+static int last_button;
+
+
+
+typedef struct test {
+	char GPIO[20];
+	char GPIO_PIN[20];
+} Tester;
+
+
+
+void assign(){
+	for(int var = 0; var < 16; var++){
+		assign_button[var] = keep_button[var];
+	}
+}
+
+
+void set(char GPIO[], int GPIO_PIN) {
+	GPIO_PinState HIGH = 1;
+	HAL_GPIO_WritePin(GPIO, GPIO_PIN, HIGH);
+}
+
+void reset(char GPIO[], int GPIO_PIN) {
+	GPIO_PinState LOW = 0;
+	HAL_GPIO_WritePin(GPIO, GPIO_PIN, LOW);
+}
+
+void get_val(int case_num) {
+
+	current_button = 0;
+
+	keep_button[case_num * 4] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
+	keep_button[case_num * 4 + 1] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11);
+	keep_button[case_num * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
+	keep_button[case_num * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
+
+
+	for(int var = 0;var < case_num * 4 + 4;var++){
+		if(keep_button[var] == 0){
+			current_button = 1;
+			break;
+		}
+	}
+
+}
+
+int see_val() {
+	for (int var = 0; var < 16; ++var) {
+		if (assign_button[var] == 0) {
+			return var+1;
+		}
+	}
+}
+
+//void light_an_led() {
+//	GPIO_PinState HIGH = 1;
+//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, HIGH);
+//}
+
+
+
+void check_it(){
+	static int number_state = 0;
+
+	switch (number_state) {
+		case 0:
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+			if (see_val() == 10) {
+				number_state += 1; //6
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 10){
+				number_state = 13;
+			}
+			break;
+		case 1:
+
+			if (see_val() == 2) {
+				number_state += 1; //64
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 2){
+				number_state = 13;
+			}
+			break;
+		case 2:
+
+			if (see_val() == 11) {
+				number_state += 1; //643
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 11){
+				number_state = 13;
+			}
+			break;
+		case 3:
+
+			if (see_val() == 2) {
+				number_state += 1; //6434
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 2){
+				number_state = 13;
+			}
+			break;
+		case 4:
+
+			if (see_val() == 4) {
+				number_state += 1; //64340
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 4){
+				number_state = 13;
+			}
+			break;
+		case 5:
+
+			if (see_val() == 6) {
+				number_state += 1; //643405
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 6){
+				number_state = 13;
+			}
+			break;
+		case 6:
+
+			if (see_val() == 4) {
+				number_state += 1; //6434050
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 4){
+				number_state = 13;
+			}
+			break;
+		case 7:
+
+			if (see_val() == 4) {
+				number_state += 1; //64340500
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 4){
+				number_state = 13;
+			}
+			break;
+		case 8:
+
+			if (see_val() == 4) {
+				number_state += 1; //643405000
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 4){
+				number_state = 13;
+			}
+			break;
+		case 9:
+
+			if (see_val() == 6) {
+				number_state += 1; //6434050005
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 6){
+				number_state = 13;
+			}
+			break;
+		case 10:
+
+			if (see_val() == 6) {
+				number_state += 1; //64340500055
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 6){
+				number_state = 13;
+			}
+			break;
+		case 11:
+
+			if (see_val() == 16) {
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+				number_state = 12 ; //OK
+			}
+			else if (see_val() == 13) {
+				number_state = 0;
+			}
+			else if (see_val() != 16){
+				number_state = 13;
+			}
+
+			break;
+		case 12:
+			if (see_val() == 13){
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+				number_state = 0;
+			}
+
+		break;
+		case 13:
+			if (see_val() == 13)
+			{
+				number_state = 0;
+			}
+
+
+		break;
+
+		}
+}
 
 /* USER CODE END PV */
 
@@ -93,12 +339,79 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+		static uint32_t timestamp1 = 10;
+		GPIO_PinState HIGH = 1;
+		GPIO_PinState LOW = 0;
+
+		if (timestamp1 <= HAL_GetTick()){
+			timestamp1 = HAL_GetTick() + 10;
+
+
+
+			switch(state) {
+			case 0:
+					//reset(tester[0], tester[2]);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, LOW);
+					get_val(state);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, HIGH);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, LOW);
+					state++;
+
+					//set(tester[0], tester[2]);
+
+			break;
+			case 1:
+	//				reset(tester[0], tester[3]);
+					get_val(state);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, HIGH);
+					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, LOW);
+					state++;
+
+	//				set(tester[0], tester[3]);
+
+
+
+			break;
+			case 2:
+	//				reset(tester[1], tester[3]);
+					get_val(state);
+					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, HIGH);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, LOW);
+					state++;
+
+	//				set(tester[1], tester[3]);
+
+
+
+			break;
+			case 3:
+	//				reset(tester[0], tester[4]);
+					get_val(state);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, HIGH);
+					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, LOW);
+	//				set(tester[0], tester[4]);
+
+					if(current_button == 1){
+						assign();
+					}
+					if (last_button == 1 && current_button == 0){
+						check_it();
+					}
+
+				last_button = current_button;
+				state = 0;
+				break;
+
+			}
+
+		}
+
+	}
   /* USER CODE END 3 */
 }
 
@@ -198,7 +511,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0|LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6|GPIO_PIN_8|GPIO_PIN_9, GPIO_PIN_RESET);
@@ -212,12 +525,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pins : PA0 LD2_Pin */
+  GPIO_InitStruct.Pin = GPIO_PIN_0|LD2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PC6 PC8 PC9 */
   GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_8|GPIO_PIN_9;
@@ -258,11 +571,12 @@ static void MX_GPIO_Init(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+				/* User can add his own implementation to report the HAL error return state */
+				__disable_irq();
+				while (1) {
+
+				}
+
   /* USER CODE END Error_Handler_Debug */
 }
 
