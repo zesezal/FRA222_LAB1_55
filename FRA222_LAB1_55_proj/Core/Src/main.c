@@ -52,22 +52,16 @@ UART_HandleTypeDef huart2;
 //R2 = PC8
 //R3 = PB8
 //R4 = PC6
+
+// create matrix to store variable in matrix 4*4 = 16
 static int keep_button[16];
 static int assign_button[16];
-static int state = 0;
+static int column = 0;
 
 static int current_button;
 static int last_button;
 
-
-
-typedef struct test {
-	char GPIO[20];
-	char GPIO_PIN[20];
-} Tester;
-
-
-
+//input the button value into matrix
 void assign(){
 	for(int var = 0; var < 16; var++){
 		assign_button[var] = keep_button[var];
@@ -75,27 +69,18 @@ void assign(){
 }
 
 
-void set(char GPIO[], int GPIO_PIN) {
-	GPIO_PinState HIGH = 1;
-	HAL_GPIO_WritePin(GPIO, GPIO_PIN, HIGH);
-}
-
-void reset(char GPIO[], int GPIO_PIN) {
-	GPIO_PinState LOW = 0;
-	HAL_GPIO_WritePin(GPIO, GPIO_PIN, LOW);
-}
-
-void get_val(int case_num) {
+//check the row if any got pressed
+void get_val(int row) {
 
 	current_button = 0;
+	//define which row we are at
+	keep_button[row * 4] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
+	keep_button[row * 4 + 1] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11);
+	keep_button[row * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
+	keep_button[row * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
 
-	keep_button[case_num * 4] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
-	keep_button[case_num * 4 + 1] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11);
-	keep_button[case_num * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
-	keep_button[case_num * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
-
-
-	for(int var = 0;var < case_num * 4 + 4;var++){
+	//check if no number is pressed
+	for(int var = 0; var < row * 4 + 4;var++){
 		if(keep_button[var] == 0){
 			current_button = 1;
 			break;
@@ -104,6 +89,7 @@ void get_val(int case_num) {
 
 }
 
+//When that button is not pressed return the value
 int see_val() {
 	for (int var = 0; var < 16; ++var) {
 		if (assign_button[var] == 0) {
@@ -112,14 +98,9 @@ int see_val() {
 	}
 }
 
-//void light_an_led() {
-//	GPIO_PinState HIGH = 1;
-//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, HIGH);
-//}
 
 
-
-void check_it(){
+void password(){
 	static int number_state = 0;
 
 	switch (number_state) {
@@ -353,58 +334,53 @@ int main(void)
 
 
 
-			switch(state) {
+			switch(column) {
 			case 0:
-					//reset(tester[0], tester[2]);
+
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, LOW);
-					get_val(state);
+					get_val(column);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, HIGH);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, LOW);
-					state++;
+					column++;
 
-					//set(tester[0], tester[2]);
+
 
 			break;
 			case 1:
-	//				reset(tester[0], tester[3]);
-					get_val(state);
+					get_val(column);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, HIGH);
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, LOW);
-					state++;
-
-	//				set(tester[0], tester[3]);
-
-
-
+					column++;
 			break;
+
+
 			case 2:
-	//				reset(tester[1], tester[3]);
-					get_val(state);
+
+					get_val(column);
 					HAL_GPIO_WritePin(GPIOB, GPIO_PIN_8, HIGH);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, LOW);
-					state++;
-
-	//				set(tester[1], tester[3]);
-
-
-
+					column++;
 			break;
+
+
+
 			case 3:
-	//				reset(tester[0], tester[4]);
-					get_val(state);
+
+					get_val(column);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, HIGH);
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, LOW);
-	//				set(tester[0], tester[4]);
 
-					if(current_button == 1){
+					if(current_button == 1)
+					{
 						assign();
 					}
-					if (last_button == 1 && current_button == 0){
-						check_it();
+					if (last_button == 1 && current_button == 0)
+					{
+						password();
 					}
 
 				last_button = current_button;
-				state = 0;
+				column = 0;
 				break;
 
 			}

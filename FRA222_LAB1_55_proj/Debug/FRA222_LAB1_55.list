@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  00020010  2**0
                   CONTENTS, READONLY
- 12 .debug_info   0000783f  00000000  00000000  00020040  2**0
+ 12 .debug_info   000077aa  00000000  00000000  00020040  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001333  00000000  00000000  0002787f  2**0
+ 13 .debug_abbrev 00001317  00000000  00000000  000277ea  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000638  00000000  00000000  00028bb8  2**3
+ 14 .debug_aranges 00000628  00000000  00000000  00028b08  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 000005d0  00000000  00000000  000291f0  2**3
+ 15 .debug_ranges 000005c0  00000000  00000000  00029130  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00014801  00000000  00000000  000297c0  2**0
+ 16 .debug_macro  00014801  00000000  00000000  000296f0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00007828  00000000  00000000  0003dfc1  2**0
+ 17 .debug_line   000077f1  00000000  00000000  0003def1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00081855  00000000  00000000  000457e9  2**0
+ 18 .debug_str    0008183f  00000000  00000000  000456e2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000c703e  2**0
+ 19 .comment      00000050  00000000  00000000  000c6f21  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001880  00000000  00000000  000c7090  2**2
+ 20 .debug_frame  00001838  00000000  00000000  000c6f74  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -351,11 +351,11 @@ Disassembly of section .text:
  80004da:	bf00      	nop
 
 080004dc <assign>:
-	char GPIO_PIN[20];
-} Tester;
 
+static int current_button;
+static int last_button;
 
-
+//input the button value into matrix
 void assign(){
  80004dc:	b480      	push	{r7}
  80004de:	b083      	sub	sp, #12
@@ -391,12 +391,10 @@ void assign(){
  8000518:	200000b0 	.word	0x200000b0
 
 0800051c <get_val>:
-void reset(char GPIO[], int GPIO_PIN) {
-	GPIO_PinState LOW = 0;
-	HAL_GPIO_WritePin(GPIO, GPIO_PIN, LOW);
-}
 
-void get_val(int case_num) {
+
+//check the row if any got pressed
+void get_val(int row) {
  800051c:	b580      	push	{r7, lr}
  800051e:	b084      	sub	sp, #16
  8000520:	af00      	add	r7, sp, #0
@@ -406,8 +404,8 @@ void get_val(int case_num) {
  8000524:	4b29      	ldr	r3, [pc, #164]	; (80005cc <get_val+0xb0>)
  8000526:	2200      	movs	r2, #0
  8000528:	601a      	str	r2, [r3, #0]
-
-	keep_button[case_num * 4] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
+	//define which row we are at
+	keep_button[row * 4] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_10);
  800052a:	f44f 6180 	mov.w	r1, #1024	; 0x400
  800052e:	4828      	ldr	r0, [pc, #160]	; (80005d0 <get_val+0xb4>)
  8000530:	f001 f808 	bl	8001544 <HAL_GPIO_ReadPin>
@@ -418,7 +416,7 @@ void get_val(int case_num) {
  800053c:	4611      	mov	r1, r2
  800053e:	4a25      	ldr	r2, [pc, #148]	; (80005d4 <get_val+0xb8>)
  8000540:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
-	keep_button[case_num * 4 + 1] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11);
+	keep_button[row * 4 + 1] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11);
  8000544:	f44f 6100 	mov.w	r1, #2048	; 0x800
  8000548:	4821      	ldr	r0, [pc, #132]	; (80005d0 <get_val+0xb4>)
  800054a:	f000 fffb 	bl	8001544 <HAL_GPIO_ReadPin>
@@ -430,7 +428,7 @@ void get_val(int case_num) {
  8000558:	4611      	mov	r1, r2
  800055a:	4a1e      	ldr	r2, [pc, #120]	; (80005d4 <get_val+0xb8>)
  800055c:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
-	keep_button[case_num * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
+	keep_button[row * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
  8000560:	f44f 5180 	mov.w	r1, #4096	; 0x1000
  8000564:	481a      	ldr	r0, [pc, #104]	; (80005d0 <get_val+0xb4>)
  8000566:	f000 ffed 	bl	8001544 <HAL_GPIO_ReadPin>
@@ -442,7 +440,7 @@ void get_val(int case_num) {
  8000574:	4611      	mov	r1, r2
  8000576:	4a17      	ldr	r2, [pc, #92]	; (80005d4 <get_val+0xb8>)
  8000578:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
-	keep_button[case_num * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
+	keep_button[row * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
  800057c:	2104      	movs	r1, #4
  800057e:	4816      	ldr	r0, [pc, #88]	; (80005d8 <get_val+0xbc>)
  8000580:	f000 ffe0 	bl	8001544 <HAL_GPIO_ReadPin>
@@ -455,8 +453,8 @@ void get_val(int case_num) {
  8000590:	4a10      	ldr	r2, [pc, #64]	; (80005d4 <get_val+0xb8>)
  8000592:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
 
-
-	for(int var = 0;var < case_num * 4 + 4;var++){
+	//check if no number is pressed
+	for(int var = 0; var < row * 4 + 4;var++){
  8000596:	2300      	movs	r3, #0
  8000598:	60fb      	str	r3, [r7, #12]
  800059a:	e00c      	b.n	80005b6 <get_val+0x9a>
@@ -472,7 +470,7 @@ void get_val(int case_num) {
  80005ac:	601a      	str	r2, [r3, #0]
 			break;
  80005ae:	e009      	b.n	80005c4 <get_val+0xa8>
-	for(int var = 0;var < case_num * 4 + 4;var++){
+	for(int var = 0; var < row * 4 + 4;var++){
  80005b0:	68fb      	ldr	r3, [r7, #12]
  80005b2:	3301      	adds	r3, #1
  80005b4:	60fb      	str	r3, [r7, #12]
@@ -498,6 +496,7 @@ void get_val(int case_num) {
 
 080005dc <see_val>:
 
+//When that button is not pressed return the value
 int see_val() {
  80005dc:	b480      	push	{r7}
  80005de:	b083      	sub	sp, #12
@@ -534,23 +533,21 @@ int see_val() {
  8000612:	bf00      	nop
  8000614:	200000b0 	.word	0x200000b0
 
-08000618 <check_it>:
-//	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, HIGH);
-//}
+08000618 <password>:
 
 
 
-void check_it(){
+void password(){
  8000618:	b580      	push	{r7, lr}
  800061a:	af00      	add	r7, sp, #0
 	static int number_state = 0;
 
 	switch (number_state) {
- 800061c:	4ba9      	ldr	r3, [pc, #676]	; (80008c4 <check_it+0x2ac>)
+ 800061c:	4ba9      	ldr	r3, [pc, #676]	; (80008c4 <password+0x2ac>)
  800061e:	681b      	ldr	r3, [r3, #0]
  8000620:	2b0d      	cmp	r3, #13
- 8000622:	f200 81c2 	bhi.w	80009aa <check_it+0x392>
- 8000626:	a201      	add	r2, pc, #4	; (adr r2, 800062c <check_it+0x14>)
+ 8000622:	f200 81c2 	bhi.w	80009aa <password+0x392>
+ 8000626:	a201      	add	r2, pc, #4	; (adr r2, 800062c <password+0x14>)
  8000628:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
  800062c:	08000665 	.word	0x08000665
  8000630:	080006ab 	.word	0x080006ab
@@ -570,19 +567,19 @@ void check_it(){
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
  8000664:	2200      	movs	r2, #0
  8000666:	2120      	movs	r1, #32
- 8000668:	4897      	ldr	r0, [pc, #604]	; (80008c8 <check_it+0x2b0>)
+ 8000668:	4897      	ldr	r0, [pc, #604]	; (80008c8 <password+0x2b0>)
  800066a:	f000 ff83 	bl	8001574 <HAL_GPIO_WritePin>
 
 			if (see_val() == 10) {
  800066e:	f7ff ffb5 	bl	80005dc <see_val>
  8000672:	4603      	mov	r3, r0
  8000674:	2b0a      	cmp	r3, #10
- 8000676:	d105      	bne.n	8000684 <check_it+0x6c>
+ 8000676:	d105      	bne.n	8000684 <password+0x6c>
 				number_state += 1; //6
- 8000678:	4b92      	ldr	r3, [pc, #584]	; (80008c4 <check_it+0x2ac>)
+ 8000678:	4b92      	ldr	r3, [pc, #584]	; (80008c4 <password+0x2ac>)
  800067a:	681b      	ldr	r3, [r3, #0]
  800067c:	3301      	adds	r3, #1
- 800067e:	4a91      	ldr	r2, [pc, #580]	; (80008c4 <check_it+0x2ac>)
+ 800067e:	4a91      	ldr	r2, [pc, #580]	; (80008c4 <password+0x2ac>)
  8000680:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -590,41 +587,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 8000682:	e177      	b.n	8000974 <check_it+0x35c>
+ 8000682:	e177      	b.n	8000974 <password+0x35c>
 			else if (see_val() == 13) {
  8000684:	f7ff ffaa 	bl	80005dc <see_val>
  8000688:	4603      	mov	r3, r0
  800068a:	2b0d      	cmp	r3, #13
- 800068c:	d103      	bne.n	8000696 <check_it+0x7e>
+ 800068c:	d103      	bne.n	8000696 <password+0x7e>
 				number_state = 0;
- 800068e:	4b8d      	ldr	r3, [pc, #564]	; (80008c4 <check_it+0x2ac>)
+ 800068e:	4b8d      	ldr	r3, [pc, #564]	; (80008c4 <password+0x2ac>)
  8000690:	2200      	movs	r2, #0
  8000692:	601a      	str	r2, [r3, #0]
 			break;
- 8000694:	e16e      	b.n	8000974 <check_it+0x35c>
+ 8000694:	e16e      	b.n	8000974 <password+0x35c>
 			else if (see_val() != 10){
  8000696:	f7ff ffa1 	bl	80005dc <see_val>
  800069a:	4603      	mov	r3, r0
  800069c:	2b0a      	cmp	r3, #10
- 800069e:	f000 8169 	beq.w	8000974 <check_it+0x35c>
+ 800069e:	f000 8169 	beq.w	8000974 <password+0x35c>
 				number_state = 13;
- 80006a2:	4b88      	ldr	r3, [pc, #544]	; (80008c4 <check_it+0x2ac>)
+ 80006a2:	4b88      	ldr	r3, [pc, #544]	; (80008c4 <password+0x2ac>)
  80006a4:	220d      	movs	r2, #13
  80006a6:	601a      	str	r2, [r3, #0]
 			break;
- 80006a8:	e164      	b.n	8000974 <check_it+0x35c>
+ 80006a8:	e164      	b.n	8000974 <password+0x35c>
 		case 1:
 
 			if (see_val() == 2) {
  80006aa:	f7ff ff97 	bl	80005dc <see_val>
  80006ae:	4603      	mov	r3, r0
  80006b0:	2b02      	cmp	r3, #2
- 80006b2:	d105      	bne.n	80006c0 <check_it+0xa8>
+ 80006b2:	d105      	bne.n	80006c0 <password+0xa8>
 				number_state += 1; //64
- 80006b4:	4b83      	ldr	r3, [pc, #524]	; (80008c4 <check_it+0x2ac>)
+ 80006b4:	4b83      	ldr	r3, [pc, #524]	; (80008c4 <password+0x2ac>)
  80006b6:	681b      	ldr	r3, [r3, #0]
  80006b8:	3301      	adds	r3, #1
- 80006ba:	4a82      	ldr	r2, [pc, #520]	; (80008c4 <check_it+0x2ac>)
+ 80006ba:	4a82      	ldr	r2, [pc, #520]	; (80008c4 <password+0x2ac>)
  80006bc:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -632,41 +629,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 80006be:	e15b      	b.n	8000978 <check_it+0x360>
+ 80006be:	e15b      	b.n	8000978 <password+0x360>
 			else if (see_val() == 13) {
  80006c0:	f7ff ff8c 	bl	80005dc <see_val>
  80006c4:	4603      	mov	r3, r0
  80006c6:	2b0d      	cmp	r3, #13
- 80006c8:	d103      	bne.n	80006d2 <check_it+0xba>
+ 80006c8:	d103      	bne.n	80006d2 <password+0xba>
 				number_state = 0;
- 80006ca:	4b7e      	ldr	r3, [pc, #504]	; (80008c4 <check_it+0x2ac>)
+ 80006ca:	4b7e      	ldr	r3, [pc, #504]	; (80008c4 <password+0x2ac>)
  80006cc:	2200      	movs	r2, #0
  80006ce:	601a      	str	r2, [r3, #0]
 			break;
- 80006d0:	e152      	b.n	8000978 <check_it+0x360>
+ 80006d0:	e152      	b.n	8000978 <password+0x360>
 			else if (see_val() != 2){
  80006d2:	f7ff ff83 	bl	80005dc <see_val>
  80006d6:	4603      	mov	r3, r0
  80006d8:	2b02      	cmp	r3, #2
- 80006da:	f000 814d 	beq.w	8000978 <check_it+0x360>
+ 80006da:	f000 814d 	beq.w	8000978 <password+0x360>
 				number_state = 13;
- 80006de:	4b79      	ldr	r3, [pc, #484]	; (80008c4 <check_it+0x2ac>)
+ 80006de:	4b79      	ldr	r3, [pc, #484]	; (80008c4 <password+0x2ac>)
  80006e0:	220d      	movs	r2, #13
  80006e2:	601a      	str	r2, [r3, #0]
 			break;
- 80006e4:	e148      	b.n	8000978 <check_it+0x360>
+ 80006e4:	e148      	b.n	8000978 <password+0x360>
 		case 2:
 
 			if (see_val() == 11) {
  80006e6:	f7ff ff79 	bl	80005dc <see_val>
  80006ea:	4603      	mov	r3, r0
  80006ec:	2b0b      	cmp	r3, #11
- 80006ee:	d105      	bne.n	80006fc <check_it+0xe4>
+ 80006ee:	d105      	bne.n	80006fc <password+0xe4>
 				number_state += 1; //643
- 80006f0:	4b74      	ldr	r3, [pc, #464]	; (80008c4 <check_it+0x2ac>)
+ 80006f0:	4b74      	ldr	r3, [pc, #464]	; (80008c4 <password+0x2ac>)
  80006f2:	681b      	ldr	r3, [r3, #0]
  80006f4:	3301      	adds	r3, #1
- 80006f6:	4a73      	ldr	r2, [pc, #460]	; (80008c4 <check_it+0x2ac>)
+ 80006f6:	4a73      	ldr	r2, [pc, #460]	; (80008c4 <password+0x2ac>)
  80006f8:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -674,41 +671,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 80006fa:	e13f      	b.n	800097c <check_it+0x364>
+ 80006fa:	e13f      	b.n	800097c <password+0x364>
 			else if (see_val() == 13) {
  80006fc:	f7ff ff6e 	bl	80005dc <see_val>
  8000700:	4603      	mov	r3, r0
  8000702:	2b0d      	cmp	r3, #13
- 8000704:	d103      	bne.n	800070e <check_it+0xf6>
+ 8000704:	d103      	bne.n	800070e <password+0xf6>
 				number_state = 0;
- 8000706:	4b6f      	ldr	r3, [pc, #444]	; (80008c4 <check_it+0x2ac>)
+ 8000706:	4b6f      	ldr	r3, [pc, #444]	; (80008c4 <password+0x2ac>)
  8000708:	2200      	movs	r2, #0
  800070a:	601a      	str	r2, [r3, #0]
 			break;
- 800070c:	e136      	b.n	800097c <check_it+0x364>
+ 800070c:	e136      	b.n	800097c <password+0x364>
 			else if (see_val() != 11){
  800070e:	f7ff ff65 	bl	80005dc <see_val>
  8000712:	4603      	mov	r3, r0
  8000714:	2b0b      	cmp	r3, #11
- 8000716:	f000 8131 	beq.w	800097c <check_it+0x364>
+ 8000716:	f000 8131 	beq.w	800097c <password+0x364>
 				number_state = 13;
- 800071a:	4b6a      	ldr	r3, [pc, #424]	; (80008c4 <check_it+0x2ac>)
+ 800071a:	4b6a      	ldr	r3, [pc, #424]	; (80008c4 <password+0x2ac>)
  800071c:	220d      	movs	r2, #13
  800071e:	601a      	str	r2, [r3, #0]
 			break;
- 8000720:	e12c      	b.n	800097c <check_it+0x364>
+ 8000720:	e12c      	b.n	800097c <password+0x364>
 		case 3:
 
 			if (see_val() == 2) {
  8000722:	f7ff ff5b 	bl	80005dc <see_val>
  8000726:	4603      	mov	r3, r0
  8000728:	2b02      	cmp	r3, #2
- 800072a:	d105      	bne.n	8000738 <check_it+0x120>
+ 800072a:	d105      	bne.n	8000738 <password+0x120>
 				number_state += 1; //6434
- 800072c:	4b65      	ldr	r3, [pc, #404]	; (80008c4 <check_it+0x2ac>)
+ 800072c:	4b65      	ldr	r3, [pc, #404]	; (80008c4 <password+0x2ac>)
  800072e:	681b      	ldr	r3, [r3, #0]
  8000730:	3301      	adds	r3, #1
- 8000732:	4a64      	ldr	r2, [pc, #400]	; (80008c4 <check_it+0x2ac>)
+ 8000732:	4a64      	ldr	r2, [pc, #400]	; (80008c4 <password+0x2ac>)
  8000734:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -716,41 +713,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 8000736:	e123      	b.n	8000980 <check_it+0x368>
+ 8000736:	e123      	b.n	8000980 <password+0x368>
 			else if (see_val() == 13) {
  8000738:	f7ff ff50 	bl	80005dc <see_val>
  800073c:	4603      	mov	r3, r0
  800073e:	2b0d      	cmp	r3, #13
- 8000740:	d103      	bne.n	800074a <check_it+0x132>
+ 8000740:	d103      	bne.n	800074a <password+0x132>
 				number_state = 0;
- 8000742:	4b60      	ldr	r3, [pc, #384]	; (80008c4 <check_it+0x2ac>)
+ 8000742:	4b60      	ldr	r3, [pc, #384]	; (80008c4 <password+0x2ac>)
  8000744:	2200      	movs	r2, #0
  8000746:	601a      	str	r2, [r3, #0]
 			break;
- 8000748:	e11a      	b.n	8000980 <check_it+0x368>
+ 8000748:	e11a      	b.n	8000980 <password+0x368>
 			else if (see_val() != 2){
  800074a:	f7ff ff47 	bl	80005dc <see_val>
  800074e:	4603      	mov	r3, r0
  8000750:	2b02      	cmp	r3, #2
- 8000752:	f000 8115 	beq.w	8000980 <check_it+0x368>
+ 8000752:	f000 8115 	beq.w	8000980 <password+0x368>
 				number_state = 13;
- 8000756:	4b5b      	ldr	r3, [pc, #364]	; (80008c4 <check_it+0x2ac>)
+ 8000756:	4b5b      	ldr	r3, [pc, #364]	; (80008c4 <password+0x2ac>)
  8000758:	220d      	movs	r2, #13
  800075a:	601a      	str	r2, [r3, #0]
 			break;
- 800075c:	e110      	b.n	8000980 <check_it+0x368>
+ 800075c:	e110      	b.n	8000980 <password+0x368>
 		case 4:
 
 			if (see_val() == 4) {
  800075e:	f7ff ff3d 	bl	80005dc <see_val>
  8000762:	4603      	mov	r3, r0
  8000764:	2b04      	cmp	r3, #4
- 8000766:	d105      	bne.n	8000774 <check_it+0x15c>
+ 8000766:	d105      	bne.n	8000774 <password+0x15c>
 				number_state += 1; //64340
- 8000768:	4b56      	ldr	r3, [pc, #344]	; (80008c4 <check_it+0x2ac>)
+ 8000768:	4b56      	ldr	r3, [pc, #344]	; (80008c4 <password+0x2ac>)
  800076a:	681b      	ldr	r3, [r3, #0]
  800076c:	3301      	adds	r3, #1
- 800076e:	4a55      	ldr	r2, [pc, #340]	; (80008c4 <check_it+0x2ac>)
+ 800076e:	4a55      	ldr	r2, [pc, #340]	; (80008c4 <password+0x2ac>)
  8000770:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -758,41 +755,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 8000772:	e107      	b.n	8000984 <check_it+0x36c>
+ 8000772:	e107      	b.n	8000984 <password+0x36c>
 			else if (see_val() == 13) {
  8000774:	f7ff ff32 	bl	80005dc <see_val>
  8000778:	4603      	mov	r3, r0
  800077a:	2b0d      	cmp	r3, #13
- 800077c:	d103      	bne.n	8000786 <check_it+0x16e>
+ 800077c:	d103      	bne.n	8000786 <password+0x16e>
 				number_state = 0;
- 800077e:	4b51      	ldr	r3, [pc, #324]	; (80008c4 <check_it+0x2ac>)
+ 800077e:	4b51      	ldr	r3, [pc, #324]	; (80008c4 <password+0x2ac>)
  8000780:	2200      	movs	r2, #0
  8000782:	601a      	str	r2, [r3, #0]
 			break;
- 8000784:	e0fe      	b.n	8000984 <check_it+0x36c>
+ 8000784:	e0fe      	b.n	8000984 <password+0x36c>
 			else if (see_val() != 4){
  8000786:	f7ff ff29 	bl	80005dc <see_val>
  800078a:	4603      	mov	r3, r0
  800078c:	2b04      	cmp	r3, #4
- 800078e:	f000 80f9 	beq.w	8000984 <check_it+0x36c>
+ 800078e:	f000 80f9 	beq.w	8000984 <password+0x36c>
 				number_state = 13;
- 8000792:	4b4c      	ldr	r3, [pc, #304]	; (80008c4 <check_it+0x2ac>)
+ 8000792:	4b4c      	ldr	r3, [pc, #304]	; (80008c4 <password+0x2ac>)
  8000794:	220d      	movs	r2, #13
  8000796:	601a      	str	r2, [r3, #0]
 			break;
- 8000798:	e0f4      	b.n	8000984 <check_it+0x36c>
+ 8000798:	e0f4      	b.n	8000984 <password+0x36c>
 		case 5:
 
 			if (see_val() == 6) {
  800079a:	f7ff ff1f 	bl	80005dc <see_val>
  800079e:	4603      	mov	r3, r0
  80007a0:	2b06      	cmp	r3, #6
- 80007a2:	d105      	bne.n	80007b0 <check_it+0x198>
+ 80007a2:	d105      	bne.n	80007b0 <password+0x198>
 				number_state += 1; //643405
- 80007a4:	4b47      	ldr	r3, [pc, #284]	; (80008c4 <check_it+0x2ac>)
+ 80007a4:	4b47      	ldr	r3, [pc, #284]	; (80008c4 <password+0x2ac>)
  80007a6:	681b      	ldr	r3, [r3, #0]
  80007a8:	3301      	adds	r3, #1
- 80007aa:	4a46      	ldr	r2, [pc, #280]	; (80008c4 <check_it+0x2ac>)
+ 80007aa:	4a46      	ldr	r2, [pc, #280]	; (80008c4 <password+0x2ac>)
  80007ac:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -800,41 +797,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 80007ae:	e0eb      	b.n	8000988 <check_it+0x370>
+ 80007ae:	e0eb      	b.n	8000988 <password+0x370>
 			else if (see_val() == 13) {
  80007b0:	f7ff ff14 	bl	80005dc <see_val>
  80007b4:	4603      	mov	r3, r0
  80007b6:	2b0d      	cmp	r3, #13
- 80007b8:	d103      	bne.n	80007c2 <check_it+0x1aa>
+ 80007b8:	d103      	bne.n	80007c2 <password+0x1aa>
 				number_state = 0;
- 80007ba:	4b42      	ldr	r3, [pc, #264]	; (80008c4 <check_it+0x2ac>)
+ 80007ba:	4b42      	ldr	r3, [pc, #264]	; (80008c4 <password+0x2ac>)
  80007bc:	2200      	movs	r2, #0
  80007be:	601a      	str	r2, [r3, #0]
 			break;
- 80007c0:	e0e2      	b.n	8000988 <check_it+0x370>
+ 80007c0:	e0e2      	b.n	8000988 <password+0x370>
 			else if (see_val() != 6){
  80007c2:	f7ff ff0b 	bl	80005dc <see_val>
  80007c6:	4603      	mov	r3, r0
  80007c8:	2b06      	cmp	r3, #6
- 80007ca:	f000 80dd 	beq.w	8000988 <check_it+0x370>
+ 80007ca:	f000 80dd 	beq.w	8000988 <password+0x370>
 				number_state = 13;
- 80007ce:	4b3d      	ldr	r3, [pc, #244]	; (80008c4 <check_it+0x2ac>)
+ 80007ce:	4b3d      	ldr	r3, [pc, #244]	; (80008c4 <password+0x2ac>)
  80007d0:	220d      	movs	r2, #13
  80007d2:	601a      	str	r2, [r3, #0]
 			break;
- 80007d4:	e0d8      	b.n	8000988 <check_it+0x370>
+ 80007d4:	e0d8      	b.n	8000988 <password+0x370>
 		case 6:
 
 			if (see_val() == 4) {
  80007d6:	f7ff ff01 	bl	80005dc <see_val>
  80007da:	4603      	mov	r3, r0
  80007dc:	2b04      	cmp	r3, #4
- 80007de:	d105      	bne.n	80007ec <check_it+0x1d4>
+ 80007de:	d105      	bne.n	80007ec <password+0x1d4>
 				number_state += 1; //6434050
- 80007e0:	4b38      	ldr	r3, [pc, #224]	; (80008c4 <check_it+0x2ac>)
+ 80007e0:	4b38      	ldr	r3, [pc, #224]	; (80008c4 <password+0x2ac>)
  80007e2:	681b      	ldr	r3, [r3, #0]
  80007e4:	3301      	adds	r3, #1
- 80007e6:	4a37      	ldr	r2, [pc, #220]	; (80008c4 <check_it+0x2ac>)
+ 80007e6:	4a37      	ldr	r2, [pc, #220]	; (80008c4 <password+0x2ac>)
  80007e8:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -842,41 +839,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 80007ea:	e0cf      	b.n	800098c <check_it+0x374>
+ 80007ea:	e0cf      	b.n	800098c <password+0x374>
 			else if (see_val() == 13) {
  80007ec:	f7ff fef6 	bl	80005dc <see_val>
  80007f0:	4603      	mov	r3, r0
  80007f2:	2b0d      	cmp	r3, #13
- 80007f4:	d103      	bne.n	80007fe <check_it+0x1e6>
+ 80007f4:	d103      	bne.n	80007fe <password+0x1e6>
 				number_state = 0;
- 80007f6:	4b33      	ldr	r3, [pc, #204]	; (80008c4 <check_it+0x2ac>)
+ 80007f6:	4b33      	ldr	r3, [pc, #204]	; (80008c4 <password+0x2ac>)
  80007f8:	2200      	movs	r2, #0
  80007fa:	601a      	str	r2, [r3, #0]
 			break;
- 80007fc:	e0c6      	b.n	800098c <check_it+0x374>
+ 80007fc:	e0c6      	b.n	800098c <password+0x374>
 			else if (see_val() != 4){
  80007fe:	f7ff feed 	bl	80005dc <see_val>
  8000802:	4603      	mov	r3, r0
  8000804:	2b04      	cmp	r3, #4
- 8000806:	f000 80c1 	beq.w	800098c <check_it+0x374>
+ 8000806:	f000 80c1 	beq.w	800098c <password+0x374>
 				number_state = 13;
- 800080a:	4b2e      	ldr	r3, [pc, #184]	; (80008c4 <check_it+0x2ac>)
+ 800080a:	4b2e      	ldr	r3, [pc, #184]	; (80008c4 <password+0x2ac>)
  800080c:	220d      	movs	r2, #13
  800080e:	601a      	str	r2, [r3, #0]
 			break;
- 8000810:	e0bc      	b.n	800098c <check_it+0x374>
+ 8000810:	e0bc      	b.n	800098c <password+0x374>
 		case 7:
 
 			if (see_val() == 4) {
  8000812:	f7ff fee3 	bl	80005dc <see_val>
  8000816:	4603      	mov	r3, r0
  8000818:	2b04      	cmp	r3, #4
- 800081a:	d105      	bne.n	8000828 <check_it+0x210>
+ 800081a:	d105      	bne.n	8000828 <password+0x210>
 				number_state += 1; //64340500
- 800081c:	4b29      	ldr	r3, [pc, #164]	; (80008c4 <check_it+0x2ac>)
+ 800081c:	4b29      	ldr	r3, [pc, #164]	; (80008c4 <password+0x2ac>)
  800081e:	681b      	ldr	r3, [r3, #0]
  8000820:	3301      	adds	r3, #1
- 8000822:	4a28      	ldr	r2, [pc, #160]	; (80008c4 <check_it+0x2ac>)
+ 8000822:	4a28      	ldr	r2, [pc, #160]	; (80008c4 <password+0x2ac>)
  8000824:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -884,41 +881,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 8000826:	e0b3      	b.n	8000990 <check_it+0x378>
+ 8000826:	e0b3      	b.n	8000990 <password+0x378>
 			else if (see_val() == 13) {
  8000828:	f7ff fed8 	bl	80005dc <see_val>
  800082c:	4603      	mov	r3, r0
  800082e:	2b0d      	cmp	r3, #13
- 8000830:	d103      	bne.n	800083a <check_it+0x222>
+ 8000830:	d103      	bne.n	800083a <password+0x222>
 				number_state = 0;
- 8000832:	4b24      	ldr	r3, [pc, #144]	; (80008c4 <check_it+0x2ac>)
+ 8000832:	4b24      	ldr	r3, [pc, #144]	; (80008c4 <password+0x2ac>)
  8000834:	2200      	movs	r2, #0
  8000836:	601a      	str	r2, [r3, #0]
 			break;
- 8000838:	e0aa      	b.n	8000990 <check_it+0x378>
+ 8000838:	e0aa      	b.n	8000990 <password+0x378>
 			else if (see_val() != 4){
  800083a:	f7ff fecf 	bl	80005dc <see_val>
  800083e:	4603      	mov	r3, r0
  8000840:	2b04      	cmp	r3, #4
- 8000842:	f000 80a5 	beq.w	8000990 <check_it+0x378>
+ 8000842:	f000 80a5 	beq.w	8000990 <password+0x378>
 				number_state = 13;
- 8000846:	4b1f      	ldr	r3, [pc, #124]	; (80008c4 <check_it+0x2ac>)
+ 8000846:	4b1f      	ldr	r3, [pc, #124]	; (80008c4 <password+0x2ac>)
  8000848:	220d      	movs	r2, #13
  800084a:	601a      	str	r2, [r3, #0]
 			break;
- 800084c:	e0a0      	b.n	8000990 <check_it+0x378>
+ 800084c:	e0a0      	b.n	8000990 <password+0x378>
 		case 8:
 
 			if (see_val() == 4) {
  800084e:	f7ff fec5 	bl	80005dc <see_val>
  8000852:	4603      	mov	r3, r0
  8000854:	2b04      	cmp	r3, #4
- 8000856:	d105      	bne.n	8000864 <check_it+0x24c>
+ 8000856:	d105      	bne.n	8000864 <password+0x24c>
 				number_state += 1; //643405000
- 8000858:	4b1a      	ldr	r3, [pc, #104]	; (80008c4 <check_it+0x2ac>)
+ 8000858:	4b1a      	ldr	r3, [pc, #104]	; (80008c4 <password+0x2ac>)
  800085a:	681b      	ldr	r3, [r3, #0]
  800085c:	3301      	adds	r3, #1
- 800085e:	4a19      	ldr	r2, [pc, #100]	; (80008c4 <check_it+0x2ac>)
+ 800085e:	4a19      	ldr	r2, [pc, #100]	; (80008c4 <password+0x2ac>)
  8000860:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -926,41 +923,41 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 8000862:	e097      	b.n	8000994 <check_it+0x37c>
+ 8000862:	e097      	b.n	8000994 <password+0x37c>
 			else if (see_val() == 13) {
  8000864:	f7ff feba 	bl	80005dc <see_val>
  8000868:	4603      	mov	r3, r0
  800086a:	2b0d      	cmp	r3, #13
- 800086c:	d103      	bne.n	8000876 <check_it+0x25e>
+ 800086c:	d103      	bne.n	8000876 <password+0x25e>
 				number_state = 0;
- 800086e:	4b15      	ldr	r3, [pc, #84]	; (80008c4 <check_it+0x2ac>)
+ 800086e:	4b15      	ldr	r3, [pc, #84]	; (80008c4 <password+0x2ac>)
  8000870:	2200      	movs	r2, #0
  8000872:	601a      	str	r2, [r3, #0]
 			break;
- 8000874:	e08e      	b.n	8000994 <check_it+0x37c>
+ 8000874:	e08e      	b.n	8000994 <password+0x37c>
 			else if (see_val() != 4){
  8000876:	f7ff feb1 	bl	80005dc <see_val>
  800087a:	4603      	mov	r3, r0
  800087c:	2b04      	cmp	r3, #4
- 800087e:	f000 8089 	beq.w	8000994 <check_it+0x37c>
+ 800087e:	f000 8089 	beq.w	8000994 <password+0x37c>
 				number_state = 13;
- 8000882:	4b10      	ldr	r3, [pc, #64]	; (80008c4 <check_it+0x2ac>)
+ 8000882:	4b10      	ldr	r3, [pc, #64]	; (80008c4 <password+0x2ac>)
  8000884:	220d      	movs	r2, #13
  8000886:	601a      	str	r2, [r3, #0]
 			break;
- 8000888:	e084      	b.n	8000994 <check_it+0x37c>
+ 8000888:	e084      	b.n	8000994 <password+0x37c>
 		case 9:
 
 			if (see_val() == 6) {
  800088a:	f7ff fea7 	bl	80005dc <see_val>
  800088e:	4603      	mov	r3, r0
  8000890:	2b06      	cmp	r3, #6
- 8000892:	d105      	bne.n	80008a0 <check_it+0x288>
+ 8000892:	d105      	bne.n	80008a0 <password+0x288>
 				number_state += 1; //6434050005
- 8000894:	4b0b      	ldr	r3, [pc, #44]	; (80008c4 <check_it+0x2ac>)
+ 8000894:	4b0b      	ldr	r3, [pc, #44]	; (80008c4 <password+0x2ac>)
  8000896:	681b      	ldr	r3, [r3, #0]
  8000898:	3301      	adds	r3, #1
- 800089a:	4a0a      	ldr	r2, [pc, #40]	; (80008c4 <check_it+0x2ac>)
+ 800089a:	4a0a      	ldr	r2, [pc, #40]	; (80008c4 <password+0x2ac>)
  800089c:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -968,29 +965,29 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 800089e:	e07b      	b.n	8000998 <check_it+0x380>
+ 800089e:	e07b      	b.n	8000998 <password+0x380>
 			else if (see_val() == 13) {
  80008a0:	f7ff fe9c 	bl	80005dc <see_val>
  80008a4:	4603      	mov	r3, r0
  80008a6:	2b0d      	cmp	r3, #13
- 80008a8:	d103      	bne.n	80008b2 <check_it+0x29a>
+ 80008a8:	d103      	bne.n	80008b2 <password+0x29a>
 				number_state = 0;
- 80008aa:	4b06      	ldr	r3, [pc, #24]	; (80008c4 <check_it+0x2ac>)
+ 80008aa:	4b06      	ldr	r3, [pc, #24]	; (80008c4 <password+0x2ac>)
  80008ac:	2200      	movs	r2, #0
  80008ae:	601a      	str	r2, [r3, #0]
 			break;
- 80008b0:	e072      	b.n	8000998 <check_it+0x380>
+ 80008b0:	e072      	b.n	8000998 <password+0x380>
 			else if (see_val() != 6){
  80008b2:	f7ff fe93 	bl	80005dc <see_val>
  80008b6:	4603      	mov	r3, r0
  80008b8:	2b06      	cmp	r3, #6
- 80008ba:	d06d      	beq.n	8000998 <check_it+0x380>
+ 80008ba:	d06d      	beq.n	8000998 <password+0x380>
 				number_state = 13;
- 80008bc:	4b01      	ldr	r3, [pc, #4]	; (80008c4 <check_it+0x2ac>)
+ 80008bc:	4b01      	ldr	r3, [pc, #4]	; (80008c4 <password+0x2ac>)
  80008be:	220d      	movs	r2, #13
  80008c0:	601a      	str	r2, [r3, #0]
 			break;
- 80008c2:	e069      	b.n	8000998 <check_it+0x380>
+ 80008c2:	e069      	b.n	8000998 <password+0x380>
  80008c4:	200000fc 	.word	0x200000fc
  80008c8:	40020000 	.word	0x40020000
 		case 10:
@@ -999,12 +996,12 @@ void check_it(){
  80008cc:	f7ff fe86 	bl	80005dc <see_val>
  80008d0:	4603      	mov	r3, r0
  80008d2:	2b06      	cmp	r3, #6
- 80008d4:	d105      	bne.n	80008e2 <check_it+0x2ca>
+ 80008d4:	d105      	bne.n	80008e2 <password+0x2ca>
 				number_state += 1; //64340500055
- 80008d6:	4b36      	ldr	r3, [pc, #216]	; (80009b0 <check_it+0x398>)
+ 80008d6:	4b36      	ldr	r3, [pc, #216]	; (80009b0 <password+0x398>)
  80008d8:	681b      	ldr	r3, [r3, #0]
  80008da:	3301      	adds	r3, #1
- 80008dc:	4a34      	ldr	r2, [pc, #208]	; (80009b0 <check_it+0x398>)
+ 80008dc:	4a34      	ldr	r2, [pc, #208]	; (80009b0 <password+0x398>)
  80008de:	6013      	str	r3, [r2, #0]
 				number_state = 0;
 			}
@@ -1012,43 +1009,43 @@ void check_it(){
 				number_state = 13;
 			}
 			break;
- 80008e0:	e05c      	b.n	800099c <check_it+0x384>
+ 80008e0:	e05c      	b.n	800099c <password+0x384>
 			else if (see_val() == 13) {
  80008e2:	f7ff fe7b 	bl	80005dc <see_val>
  80008e6:	4603      	mov	r3, r0
  80008e8:	2b0d      	cmp	r3, #13
- 80008ea:	d103      	bne.n	80008f4 <check_it+0x2dc>
+ 80008ea:	d103      	bne.n	80008f4 <password+0x2dc>
 				number_state = 0;
- 80008ec:	4b30      	ldr	r3, [pc, #192]	; (80009b0 <check_it+0x398>)
+ 80008ec:	4b30      	ldr	r3, [pc, #192]	; (80009b0 <password+0x398>)
  80008ee:	2200      	movs	r2, #0
  80008f0:	601a      	str	r2, [r3, #0]
 			break;
- 80008f2:	e053      	b.n	800099c <check_it+0x384>
+ 80008f2:	e053      	b.n	800099c <password+0x384>
 			else if (see_val() != 6){
  80008f4:	f7ff fe72 	bl	80005dc <see_val>
  80008f8:	4603      	mov	r3, r0
  80008fa:	2b06      	cmp	r3, #6
- 80008fc:	d04e      	beq.n	800099c <check_it+0x384>
+ 80008fc:	d04e      	beq.n	800099c <password+0x384>
 				number_state = 13;
- 80008fe:	4b2c      	ldr	r3, [pc, #176]	; (80009b0 <check_it+0x398>)
+ 80008fe:	4b2c      	ldr	r3, [pc, #176]	; (80009b0 <password+0x398>)
  8000900:	220d      	movs	r2, #13
  8000902:	601a      	str	r2, [r3, #0]
 			break;
- 8000904:	e04a      	b.n	800099c <check_it+0x384>
+ 8000904:	e04a      	b.n	800099c <password+0x384>
 		case 11:
 
 			if (see_val() == 16) {
  8000906:	f7ff fe69 	bl	80005dc <see_val>
  800090a:	4603      	mov	r3, r0
  800090c:	2b10      	cmp	r3, #16
- 800090e:	d108      	bne.n	8000922 <check_it+0x30a>
+ 800090e:	d108      	bne.n	8000922 <password+0x30a>
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
  8000910:	2201      	movs	r2, #1
  8000912:	2120      	movs	r1, #32
- 8000914:	4827      	ldr	r0, [pc, #156]	; (80009b4 <check_it+0x39c>)
+ 8000914:	4827      	ldr	r0, [pc, #156]	; (80009b4 <password+0x39c>)
  8000916:	f000 fe2d 	bl	8001574 <HAL_GPIO_WritePin>
 				number_state = 12 ; //OK
- 800091a:	4b25      	ldr	r3, [pc, #148]	; (80009b0 <check_it+0x398>)
+ 800091a:	4b25      	ldr	r3, [pc, #148]	; (80009b0 <password+0x398>)
  800091c:	220c      	movs	r2, #12
  800091e:	601a      	str	r2, [r3, #0]
 			}
@@ -1057,103 +1054,103 @@ void check_it(){
 			}
 
 			break;
- 8000920:	e03e      	b.n	80009a0 <check_it+0x388>
+ 8000920:	e03e      	b.n	80009a0 <password+0x388>
 			else if (see_val() == 13) {
  8000922:	f7ff fe5b 	bl	80005dc <see_val>
  8000926:	4603      	mov	r3, r0
  8000928:	2b0d      	cmp	r3, #13
- 800092a:	d103      	bne.n	8000934 <check_it+0x31c>
+ 800092a:	d103      	bne.n	8000934 <password+0x31c>
 				number_state = 0;
- 800092c:	4b20      	ldr	r3, [pc, #128]	; (80009b0 <check_it+0x398>)
+ 800092c:	4b20      	ldr	r3, [pc, #128]	; (80009b0 <password+0x398>)
  800092e:	2200      	movs	r2, #0
  8000930:	601a      	str	r2, [r3, #0]
 			break;
- 8000932:	e035      	b.n	80009a0 <check_it+0x388>
+ 8000932:	e035      	b.n	80009a0 <password+0x388>
 			else if (see_val() != 16){
  8000934:	f7ff fe52 	bl	80005dc <see_val>
  8000938:	4603      	mov	r3, r0
  800093a:	2b10      	cmp	r3, #16
- 800093c:	d030      	beq.n	80009a0 <check_it+0x388>
+ 800093c:	d030      	beq.n	80009a0 <password+0x388>
 				number_state = 13;
- 800093e:	4b1c      	ldr	r3, [pc, #112]	; (80009b0 <check_it+0x398>)
+ 800093e:	4b1c      	ldr	r3, [pc, #112]	; (80009b0 <password+0x398>)
  8000940:	220d      	movs	r2, #13
  8000942:	601a      	str	r2, [r3, #0]
 			break;
- 8000944:	e02c      	b.n	80009a0 <check_it+0x388>
+ 8000944:	e02c      	b.n	80009a0 <password+0x388>
 		case 12:
 			if (see_val() == 13){
  8000946:	f7ff fe49 	bl	80005dc <see_val>
  800094a:	4603      	mov	r3, r0
  800094c:	2b0d      	cmp	r3, #13
- 800094e:	d129      	bne.n	80009a4 <check_it+0x38c>
+ 800094e:	d129      	bne.n	80009a4 <password+0x38c>
 				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
  8000950:	2200      	movs	r2, #0
  8000952:	2120      	movs	r1, #32
- 8000954:	4817      	ldr	r0, [pc, #92]	; (80009b4 <check_it+0x39c>)
+ 8000954:	4817      	ldr	r0, [pc, #92]	; (80009b4 <password+0x39c>)
  8000956:	f000 fe0d 	bl	8001574 <HAL_GPIO_WritePin>
 				number_state = 0;
- 800095a:	4b15      	ldr	r3, [pc, #84]	; (80009b0 <check_it+0x398>)
+ 800095a:	4b15      	ldr	r3, [pc, #84]	; (80009b0 <password+0x398>)
  800095c:	2200      	movs	r2, #0
  800095e:	601a      	str	r2, [r3, #0]
 			}
 
 		break;
- 8000960:	e020      	b.n	80009a4 <check_it+0x38c>
+ 8000960:	e020      	b.n	80009a4 <password+0x38c>
 		case 13:
 			if (see_val() == 13)
  8000962:	f7ff fe3b 	bl	80005dc <see_val>
  8000966:	4603      	mov	r3, r0
  8000968:	2b0d      	cmp	r3, #13
- 800096a:	d11d      	bne.n	80009a8 <check_it+0x390>
+ 800096a:	d11d      	bne.n	80009a8 <password+0x390>
 			{
 				number_state = 0;
- 800096c:	4b10      	ldr	r3, [pc, #64]	; (80009b0 <check_it+0x398>)
+ 800096c:	4b10      	ldr	r3, [pc, #64]	; (80009b0 <password+0x398>)
  800096e:	2200      	movs	r2, #0
  8000970:	601a      	str	r2, [r3, #0]
 			}
 
 
 		break;
- 8000972:	e019      	b.n	80009a8 <check_it+0x390>
+ 8000972:	e019      	b.n	80009a8 <password+0x390>
 			break;
  8000974:	bf00      	nop
- 8000976:	e018      	b.n	80009aa <check_it+0x392>
+ 8000976:	e018      	b.n	80009aa <password+0x392>
 			break;
  8000978:	bf00      	nop
- 800097a:	e016      	b.n	80009aa <check_it+0x392>
+ 800097a:	e016      	b.n	80009aa <password+0x392>
 			break;
  800097c:	bf00      	nop
- 800097e:	e014      	b.n	80009aa <check_it+0x392>
+ 800097e:	e014      	b.n	80009aa <password+0x392>
 			break;
  8000980:	bf00      	nop
- 8000982:	e012      	b.n	80009aa <check_it+0x392>
+ 8000982:	e012      	b.n	80009aa <password+0x392>
 			break;
  8000984:	bf00      	nop
- 8000986:	e010      	b.n	80009aa <check_it+0x392>
+ 8000986:	e010      	b.n	80009aa <password+0x392>
 			break;
  8000988:	bf00      	nop
- 800098a:	e00e      	b.n	80009aa <check_it+0x392>
+ 800098a:	e00e      	b.n	80009aa <password+0x392>
 			break;
  800098c:	bf00      	nop
- 800098e:	e00c      	b.n	80009aa <check_it+0x392>
+ 800098e:	e00c      	b.n	80009aa <password+0x392>
 			break;
  8000990:	bf00      	nop
- 8000992:	e00a      	b.n	80009aa <check_it+0x392>
+ 8000992:	e00a      	b.n	80009aa <password+0x392>
 			break;
  8000994:	bf00      	nop
- 8000996:	e008      	b.n	80009aa <check_it+0x392>
+ 8000996:	e008      	b.n	80009aa <password+0x392>
 			break;
  8000998:	bf00      	nop
- 800099a:	e006      	b.n	80009aa <check_it+0x392>
+ 800099a:	e006      	b.n	80009aa <password+0x392>
 			break;
  800099c:	bf00      	nop
- 800099e:	e004      	b.n	80009aa <check_it+0x392>
+ 800099e:	e004      	b.n	80009aa <password+0x392>
 			break;
  80009a0:	bf00      	nop
- 80009a2:	e002      	b.n	80009aa <check_it+0x392>
+ 80009a2:	e002      	b.n	80009aa <password+0x392>
 		break;
  80009a4:	bf00      	nop
- 80009a6:	e000      	b.n	80009aa <check_it+0x392>
+ 80009a6:	e000      	b.n	80009aa <password+0x392>
 		break;
  80009a8:	bf00      	nop
 
@@ -1226,7 +1223,7 @@ int main(void)
 
 
 
-			switch(state) {
+			switch(column) {
  80009f2:	4b47      	ldr	r3, [pc, #284]	; (8000b10 <main+0x158>)
  80009f4:	681b      	ldr	r3, [r3, #0]
  80009f6:	2b03      	cmp	r3, #3
@@ -1238,14 +1235,14 @@ int main(void)
  8000a08:	08000a83 	.word	0x08000a83
  8000a0c:	08000ab3 	.word	0x08000ab3
 			case 0:
-					//reset(tester[0], tester[2]);
+
 					HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, LOW);
  8000a10:	79bb      	ldrb	r3, [r7, #6]
  8000a12:	461a      	mov	r2, r3
  8000a14:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000a18:	483e      	ldr	r0, [pc, #248]	; (8000b14 <main+0x15c>)
  8000a1a:	f000 fdab 	bl	8001574 <HAL_GPIO_WritePin>
-					get_val(state);
+					get_val(column);
  8000a1e:	4b3c      	ldr	r3, [pc, #240]	; (8000b10 <main+0x158>)
  8000a20:	681b      	ldr	r3, [r3, #0]
  8000a22:	4618      	mov	r0, r3
@@ -1262,20 +1259,19 @@ int main(void)
  8000a3a:	f44f 7180 	mov.w	r1, #256	; 0x100
  8000a3e:	4835      	ldr	r0, [pc, #212]	; (8000b14 <main+0x15c>)
  8000a40:	f000 fd98 	bl	8001574 <HAL_GPIO_WritePin>
-					state++;
+					column++;
  8000a44:	4b32      	ldr	r3, [pc, #200]	; (8000b10 <main+0x158>)
  8000a46:	681b      	ldr	r3, [r3, #0]
  8000a48:	3301      	adds	r3, #1
  8000a4a:	4a31      	ldr	r2, [pc, #196]	; (8000b10 <main+0x158>)
  8000a4c:	6013      	str	r3, [r2, #0]
 
-					//set(tester[0], tester[2]);
+
 
 			break;
  8000a4e:	e05b      	b.n	8000b08 <main+0x150>
 			case 1:
-	//				reset(tester[0], tester[3]);
-					get_val(state);
+					get_val(column);
  8000a50:	4b2f      	ldr	r3, [pc, #188]	; (8000b10 <main+0x158>)
  8000a52:	681b      	ldr	r3, [r3, #0]
  8000a54:	4618      	mov	r0, r3
@@ -1292,22 +1288,19 @@ int main(void)
  8000a6c:	f44f 7180 	mov.w	r1, #256	; 0x100
  8000a70:	4829      	ldr	r0, [pc, #164]	; (8000b18 <main+0x160>)
  8000a72:	f000 fd7f 	bl	8001574 <HAL_GPIO_WritePin>
-					state++;
+					column++;
  8000a76:	4b26      	ldr	r3, [pc, #152]	; (8000b10 <main+0x158>)
  8000a78:	681b      	ldr	r3, [r3, #0]
  8000a7a:	3301      	adds	r3, #1
  8000a7c:	4a24      	ldr	r2, [pc, #144]	; (8000b10 <main+0x158>)
  8000a7e:	6013      	str	r3, [r2, #0]
-
-	//				set(tester[0], tester[3]);
-
-
-
 			break;
  8000a80:	e042      	b.n	8000b08 <main+0x150>
+
+
 			case 2:
-	//				reset(tester[1], tester[3]);
-					get_val(state);
+
+					get_val(column);
  8000a82:	4b23      	ldr	r3, [pc, #140]	; (8000b10 <main+0x158>)
  8000a84:	681b      	ldr	r3, [r3, #0]
  8000a86:	4618      	mov	r0, r3
@@ -1324,22 +1317,20 @@ int main(void)
  8000a9e:	2140      	movs	r1, #64	; 0x40
  8000aa0:	481c      	ldr	r0, [pc, #112]	; (8000b14 <main+0x15c>)
  8000aa2:	f000 fd67 	bl	8001574 <HAL_GPIO_WritePin>
-					state++;
+					column++;
  8000aa6:	4b1a      	ldr	r3, [pc, #104]	; (8000b10 <main+0x158>)
  8000aa8:	681b      	ldr	r3, [r3, #0]
  8000aaa:	3301      	adds	r3, #1
  8000aac:	4a18      	ldr	r2, [pc, #96]	; (8000b10 <main+0x158>)
  8000aae:	6013      	str	r3, [r2, #0]
-
-	//				set(tester[1], tester[3]);
-
-
-
 			break;
  8000ab0:	e02a      	b.n	8000b08 <main+0x150>
+
+
+
 			case 3:
-	//				reset(tester[0], tester[4]);
-					get_val(state);
+
+					get_val(column);
  8000ab2:	4b17      	ldr	r3, [pc, #92]	; (8000b10 <main+0x158>)
  8000ab4:	681b      	ldr	r3, [r3, #0]
  8000ab6:	4618      	mov	r0, r3
@@ -1356,17 +1347,17 @@ int main(void)
  8000acc:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000ad0:	4810      	ldr	r0, [pc, #64]	; (8000b14 <main+0x15c>)
  8000ad2:	f000 fd4f 	bl	8001574 <HAL_GPIO_WritePin>
-	//				set(tester[0], tester[4]);
 
-					if(current_button == 1){
+					if(current_button == 1)
  8000ad6:	4b11      	ldr	r3, [pc, #68]	; (8000b1c <main+0x164>)
  8000ad8:	681b      	ldr	r3, [r3, #0]
  8000ada:	2b01      	cmp	r3, #1
  8000adc:	d101      	bne.n	8000ae2 <main+0x12a>
+					{
 						assign();
  8000ade:	f7ff fcfd 	bl	80004dc <assign>
 					}
-					if (last_button == 1 && current_button == 0){
+					if (last_button == 1 && current_button == 0)
  8000ae2:	4b0f      	ldr	r3, [pc, #60]	; (8000b20 <main+0x168>)
  8000ae4:	681b      	ldr	r3, [r3, #0]
  8000ae6:	2b01      	cmp	r3, #1
@@ -1375,8 +1366,9 @@ int main(void)
  8000aec:	681b      	ldr	r3, [r3, #0]
  8000aee:	2b00      	cmp	r3, #0
  8000af0:	d101      	bne.n	8000af6 <main+0x13e>
-						check_it();
- 8000af2:	f7ff fd91 	bl	8000618 <check_it>
+					{
+						password();
+ 8000af2:	f7ff fd91 	bl	8000618 <password>
 					}
 
 				last_button = current_button;
@@ -1384,7 +1376,7 @@ int main(void)
  8000af8:	681b      	ldr	r3, [r3, #0]
  8000afa:	4a09      	ldr	r2, [pc, #36]	; (8000b20 <main+0x168>)
  8000afc:	6013      	str	r3, [r2, #0]
-				state = 0;
+				column = 0;
  8000afe:	4b04      	ldr	r3, [pc, #16]	; (8000b10 <main+0x158>)
  8000b00:	2200      	movs	r2, #0
  8000b02:	601a      	str	r2, [r3, #0]
