@@ -79,7 +79,7 @@ void get_val(int row) {
 	keep_button[row * 4 + 2] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_12);
 	keep_button[row * 4 + 3] = HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2);
 
-	//check if no number is pressed
+	//check if botton is pressed
 	for(int var = 0; var < row * 4 + 4;var++){
 		if(keep_button[var] == 0){
 			current_button = 1;
@@ -89,7 +89,7 @@ void get_val(int row) {
 
 }
 
-//When that button is not pressed return the value
+//When that button is pressed return the value
 int see_val() {
 	for (int var = 0; var < 16; ++var) {
 		if (assign_button[var] == 0) {
@@ -315,7 +315,9 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  static uint32_t timestamp1 = 10;
+  GPIO_PinState HIGH = 1;
+  GPIO_PinState LOW = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -325,9 +327,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		static uint32_t timestamp1 = 10;
-		GPIO_PinState HIGH = 1;
-		GPIO_PinState LOW = 0;
+
 
 		if (timestamp1 <= HAL_GetTick()){
 			timestamp1 = HAL_GetTick() + 10;

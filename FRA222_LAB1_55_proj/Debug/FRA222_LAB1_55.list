@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  00020010  2**0
                   CONTENTS, READONLY
- 12 .debug_info   000077aa  00000000  00000000  00020040  2**0
+ 12 .debug_info   000077a0  00000000  00000000  00020040  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001317  00000000  00000000  000277ea  2**0
+ 13 .debug_abbrev 00001317  00000000  00000000  000277e0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000628  00000000  00000000  00028b08  2**3
+ 14 .debug_aranges 00000628  00000000  00000000  00028af8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 000005c0  00000000  00000000  00029130  2**3
+ 15 .debug_ranges 000005c0  00000000  00000000  00029120  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00014801  00000000  00000000  000296f0  2**0
+ 16 .debug_macro  00014801  00000000  00000000  000296e0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000077f1  00000000  00000000  0003def1  2**0
+ 17 .debug_line   000077f1  00000000  00000000  0003dee1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0008183f  00000000  00000000  000456e2  2**0
+ 18 .debug_str    0008183f  00000000  00000000  000456d2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000c6f21  2**0
+ 19 .comment      00000050  00000000  00000000  000c6f11  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001838  00000000  00000000  000c6f74  2**2
+ 20 .debug_frame  00001838  00000000  00000000  000c6f64  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -453,7 +453,7 @@ void get_val(int row) {
  8000590:	4a10      	ldr	r2, [pc, #64]	; (80005d4 <get_val+0xb8>)
  8000592:	f842 1023 	str.w	r1, [r2, r3, lsl #2]
 
-	//check if no number is pressed
+	//check if botton is pressed
 	for(int var = 0; var < row * 4 + 4;var++){
  8000596:	2300      	movs	r3, #0
  8000598:	60fb      	str	r3, [r7, #12]
@@ -496,7 +496,7 @@ void get_val(int row) {
 
 080005dc <see_val>:
 
-//When that button is not pressed return the value
+//When that button is pressed return the value
 int see_val() {
  80005dc:	b480      	push	{r7}
  80005de:	b083      	sub	sp, #12
@@ -1195,17 +1195,18 @@ int main(void)
  80009c6:	f000 f941 	bl	8000c4c <MX_GPIO_Init>
   MX_USART2_UART_Init();
  80009ca:	f000 f915 	bl	8000bf8 <MX_USART2_UART_Init>
-	{
+  /* USER CODE BEGIN 2 */
+  static uint32_t timestamp1 = 10;
+  GPIO_PinState HIGH = 1;
+ 80009ce:	2301      	movs	r3, #1
+ 80009d0:	71fb      	strb	r3, [r7, #7]
+  GPIO_PinState LOW = 0;
+ 80009d2:	2300      	movs	r3, #0
+ 80009d4:	71bb      	strb	r3, [r7, #6]
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		static uint32_t timestamp1 = 10;
-		GPIO_PinState HIGH = 1;
- 80009ce:	2301      	movs	r3, #1
- 80009d0:	71fb      	strb	r3, [r7, #7]
-		GPIO_PinState LOW = 0;
- 80009d2:	2300      	movs	r3, #0
- 80009d4:	71bb      	strb	r3, [r7, #6]
+
 
 		if (timestamp1 <= HAL_GetTick()){
  80009d6:	f000 fb3f 	bl	8001058 <HAL_GetTick>
@@ -1227,7 +1228,7 @@ int main(void)
  80009f2:	4b47      	ldr	r3, [pc, #284]	; (8000b10 <main+0x158>)
  80009f4:	681b      	ldr	r3, [r3, #0]
  80009f6:	2b03      	cmp	r3, #3
- 80009f8:	d8e9      	bhi.n	80009ce <main+0x16>
+ 80009f8:	d8ed      	bhi.n	80009d6 <main+0x1e>
  80009fa:	a201      	add	r2, pc, #4	; (adr r2, 8000a00 <main+0x48>)
  80009fc:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
  8000a00:	08000a11 	.word	0x08000a11
@@ -1387,8 +1388,8 @@ int main(void)
 
 		}
  8000b06:	bf00      	nop
-	{
- 8000b08:	e761      	b.n	80009ce <main+0x16>
+		if (timestamp1 <= HAL_GetTick()){
+ 8000b08:	e765      	b.n	80009d6 <main+0x1e>
  8000b0a:	bf00      	nop
  8000b0c:	20000000 	.word	0x20000000
  8000b10:	200000f0 	.word	0x200000f0
